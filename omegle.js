@@ -3,8 +3,12 @@ function omegle(targ,respfunc) {
 		method: 'get',
 		onSuccess: function(transport) {
 			var response = transport.responseText;
-			respfunc(response.evalJSON());
-		},
+			if(response.isJSON()) {
+				respfunc(response.evalJSON());
+			} else {
+//				respfunc(response);
+			}
+		}.bind(targ),
 		onFailure: function() {
 			alert("Request failed");
 		}
@@ -102,37 +106,30 @@ var OmegleConnection = Class.create({
 	send: function(message) {
 		omegle('send&id='+this.id+'&msg='+message,
 			function(response) {
-				alert(response);
+				alert("Send: " + response);
 			}
 		);
 	},
 	notifyTyping: function() {
 		omegle('typing&id='+this.id,
 			function(response) {
-				alert(response);
+				alert("Typing: "+response);
 			}
 		);
 	},
 	notifyStoppedTyping: function() {
 		omegle('stoppedTyping&id='+this.id,
 			function(response) {
-				alert(response);
+				alert("Stopped Typing: " + response);
 			}
 		);
 	},
 	notifyDisconnect: function() {
 		omegle('disconnect&id='+this.id,
 			function(response) {
-				alert(response);
+				alert("Disconnect: " + response);
 			}
 		);
 	}
 });
 
-var p1,p2;
-window.onload = function() {
-	p1 = new OmegleConnection('td_chat_1','red');
-	p2 = new OmegleConnection('td_chat_2','green');
-	p1.partner = p2;
-	p2.partner = p1;
-};

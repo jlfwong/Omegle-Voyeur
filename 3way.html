@@ -9,8 +9,10 @@
 		window.onload = function() {
 			p1 = new OmegleConnection('td_chat_1','red');
 			p2 = new OmegleConnection('td_chat_2','green');
+			p3 = new OmegleConnection('td_chat_3','blue');
 			p1.partner = p2;
-			p2.partner = p1;
+			p2.partner = p3;
+			p3.partner = p1;
 		};
 	</script>
 </head>
@@ -26,10 +28,12 @@
 	<tr class='header'>
 		<td>Stranger 1's View</td>
 		<td>Stranger 2's View</td>
+		<td>Stranger 3's View</td>
 	</tr>
 	<tr class='chat_content'>
 		<td id='td_chat_1'></td>
 		<td id='td_chat_2'></td>
+		<td id='td_chat_3'></td>
 	</tr>
 </table>
 </html>
