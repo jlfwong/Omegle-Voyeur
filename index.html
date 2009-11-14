@@ -1,35 +1,13 @@
 <html>
 <head>
 	<title>Omegle Voyeur</title>
-	<link rel="stylesheet" type="text/css" href="style.css"/>
-	<script language="javascript" src="prototype.js"></script>
-	<script language="javascript" src="omegle.js"></script>
-	<script language="javascript">
-		var p1,p2;
-		window.onload = function() {
-			p1 = new OmegleConnection('td_chat_1','red');
-			p2 = new OmegleConnection('td_chat_2','green');
-			p1.partner = p2;
-			p2.partner = p1;
-		};
-	</script>
 </head>
 <body>
-<table id='table_events' border=1>
-	<tr>
-		<td>Id</td>
-		<td>Status</td>
-	<!--	<td>Message</td> -->
-	</tr>
-</table>
-<table id='table_chat' border=1>
-	<tr class='header'>
-		<td>Stranger 1's View</td>
-		<td>Stranger 2's View</td>
-	</tr>
-	<tr class='chat_content'>
-		<td id='td_chat_1'></td>
-		<td id='td_chat_2'></td>
-	</tr>
-</table>
+<h1>Omegle Voyeur</h1>
+<ol>
+	<li><a href='2way.html'>2 way chat</a></li>
+	<li><a href='3way.html'>3 way loop</a></li>
+	<li><a href='3way_fullyconnected.html'>3 way fully connected</a></li>
+	<li><a href='3way_selfloops.html'>3 way full connected w/ selfloops</a></li>
+</ol>
 </html>

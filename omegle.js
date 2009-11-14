@@ -34,7 +34,7 @@ function display_event(id,omegle_event,css_class) {
 var OmegleConnection = Class.create({
 	initialize: function(chat_td_id,css_class) {
 		this.id = '';
-		this.partner = '';
+		this.partners = [];
 		this.chat_td = $(chat_td_id);
 		this.css_class = css_class;
 
@@ -47,8 +47,8 @@ var OmegleConnection = Class.create({
 			}.bind(this)
 		);
 	},
-	setPartner: function(partner) {
-		this.partner = partner;
+	addPartner: function(partner) {
+		this.partners[this.partners.length] = partner;
 	},
 	systemMessage: function(message) {	
 		var span = new Element('span',{
@@ -77,22 +77,38 @@ var OmegleConnection = Class.create({
 			var signal = events[i][0];
 			if (signal == 'gotMessage') {
 				var message = events[i][1];
-				this.addToChat('You: ',this.css_class,message);
-				this.partner.addToChat('Stranger: ',this.css_class,message);
 
-				this.partner.send(events[i][1]);
+				this.addToChat('You: ',this.css_class,message);
+				
+				if (this.partners.length == 0) {
+					alert(this.css_class + " has no partners");
+				}
+				for (var i = 0; i < this.partners.length; i++) {
+					partner = this.partners[i];
+					partner.addToChat('Stranger: ',this.css_class,message);
+					partner.send(message);
+				}
 			} else if (signal == 'waiting') {
 				this.systemMessage("Looking for someone you can chat with. Hang on.");
 			} else if (signal == 'connected') {
 				this.systemMessage("You're now chatting with a random stranger. Say hi!");
 			} else if (signal == 'typing') {
-				this.partner.notifyTyping();
+				for (var i = 0; i < this.partners.length; i++) {
+					partner = this.partners[i];
+					partner.notifyTyping();
+				}
 			} else if (signal == 'stoppedTyping') {
-				this.partner.notifyStoppedTyping();
+				for (var i = 0; i < this.partners.length; i++) {
+					partner = this.partners[i];
+					partner.notifyStoppedTyping();
+				}
 			} else if (signal == 'strangerDisconnected') {
 				this.systemMessage("You have disconnected.");
-				this.partner.notifyDisconnect();
-				this.partner.systemMessage("Your conversational partner has disconnected.");
+				for (var i = 0; i < this.partners.length; i++) {
+					partner = this.partners[i];
+					partner.notifyDisconnect();
+					partner.systemMessage("Your conversational partner has disconnected.");
+				}
 			}
 		}
 		this.checkEvents();

@@ -6,12 +6,17 @@
 	<script language="javascript" src="omegle.js"></script>
 	<script language="javascript">
 		window.onload = function() {
-			var connection = [
+			connections = [
 				new OmegleConnection('td_chat_1','red'),
-				new OmegleConnection('td_chat_2','green')
+				new OmegleConnection('td_chat_2','green'),
+				new OmegleConnection('td_chat_3','blue')
 			];
-			connection[0].addPartner(connection[1]);
-			connection[1].addPartner(connection[0]);
+			for (var i = 0; i < 3; i++) {
+				for (var j = 0; j < 3; j++) {
+					//if (i == j) continue;
+					connections[i].addPartner(connections[j]);
+				}
+			}
 		};
 	</script>
 </head>
@@ -27,10 +32,12 @@
 	<tr class='header'>
 		<td>Stranger 1's View</td>
 		<td>Stranger 2's View</td>
+		<td>Stranger 3's View</td>
 	</tr>
 	<tr class='chat_content'>
 		<td id='td_chat_1'></td>
 		<td id='td_chat_2'></td>
+		<td id='td_chat_3'></td>
 	</tr>
 </table>
 </html>
