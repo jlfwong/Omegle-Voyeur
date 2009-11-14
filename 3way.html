@@ -10,9 +10,9 @@
 			p1 = new OmegleConnection('td_chat_1','red');
 			p2 = new OmegleConnection('td_chat_2','green');
 			p3 = new OmegleConnection('td_chat_3','blue');
-			p1.partner = p2;
-			p2.partner = p3;
-			p3.partner = p1;
+			p1.setPartner(p2);
+			p2.setPartner(p3);
+			p3.setPartner(p1);
 		};
 	</script>
 </head>

@@ -9,8 +9,8 @@
 		window.onload = function() {
 			p1 = new OmegleConnection('td_chat_1','red');
 			p2 = new OmegleConnection('td_chat_2','green');
-			p1.partner = p2;
-			p2.partner = p1;
+			p1.setPartner(p2);
+			p2.setPartner(p1);
 		};
 	</script>
 </head>

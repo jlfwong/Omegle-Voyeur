@@ -5,8 +5,6 @@ function omegle(targ,respfunc) {
 			var response = transport.responseText;
 			if(response.isJSON()) {
 				respfunc(response.evalJSON());
-			} else {
-//				respfunc(response);
 			}
 		}.bind(targ),
 		onFailure: function() {
@@ -34,12 +32,9 @@ function display_event(id,omegle_event,css_class) {
 }
 
 var OmegleConnection = Class.create({
-	id: '',
-	partner: '',
-	css_class: '',
-	chat_td: '',
-
 	initialize: function(chat_td_id,css_class) {
+		this.id = '';
+		this.partner = '';
 		this.chat_td = $(chat_td_id);
 		this.css_class = css_class;
 
@@ -51,6 +46,9 @@ var OmegleConnection = Class.create({
 				this.checkEvents();
 			}.bind(this)
 		);
+	},
+	setPartner: function(partner) {
+		this.partner = partner;
 	},
 	systemMessage: function(message) {	
 		var span = new Element('span',{
@@ -72,64 +70,48 @@ var OmegleConnection = Class.create({
 		this.chat_td.appendChild(text);
 		this.chat_td.appendChild(br);
 	},
+	handleEvents: function(events) {
+		for (var i = 0; i < events.length; i++) {
+			display_event(this.id,events[i],this.css_class);
+
+			var signal = events[i][0];
+			if (signal == 'gotMessage') {
+				var message = events[i][1];
+				this.addToChat('You: ',this.css_class,message);
+				this.partner.addToChat('Stranger: ',this.css_class,message);
+
+				this.partner.send(events[i][1]);
+			} else if (signal == 'waiting') {
+				this.systemMessage("Looking for someone you can chat with. Hang on.");
+			} else if (signal == 'connected') {
+				this.systemMessage("You're now chatting with a random stranger. Say hi!");
+			} else if (signal == 'typing') {
+				this.partner.notifyTyping();
+			} else if (signal == 'stoppedTyping') {
+				this.partner.notifyStoppedTyping();
+			} else if (signal == 'strangerDisconnected') {
+				this.systemMessage("You have disconnected.");
+				this.partner.notifyDisconnect();
+				this.partner.systemMessage("Your conversational partner has disconnected.");
+			}
+		}
+		this.checkEvents();
+	},
+
 	checkEvents: function() {
-		omegle('events&id='+this.id,
-			function(events) {
-				for (var i = 0; i < events.length; i++) {
-					display_event(this.id,events[i],this.css_class);
-
-					var signal = events[i][0];
-					if (signal == 'gotMessage') {
-						var message = events[i][1];
-						this.addToChat('You: ','you',message);
-						this.partner.addToChat('Stranger: ','stranger',message);
-
-						this.partner.send(events[i][1]);
-					} else if (signal == 'waiting') {
-						this.systemMessage("Looking for someone you can chat with. Hang on.");
-					} else if (signal == 'connected') {
-						this.systemMessage("You're now chatting with a random stranger. Say hi!");
-					} else if (signal == 'typing') {
-						this.partner.notifyTyping();
-					} else if (signal == 'stoppedTyping') {
-						this.partner.notifyStoppedTyping();
-					} else if (signal == 'strangerDisconnected') {
-						this.systemMessage("You have disconnected.");
-						this.partner.notifyDisconnect();
-						this.partner.systemMessage("Your conversational partner has disconnected.");
-					}
-				}
-				this.checkEvents();
-			}.bind(this)
-		);
+		omegle('events&id='+this.id,this.handleEvents.bind(this));
 	},
 	send: function(message) {
-		omegle('send&id='+this.id+'&msg='+message,
-			function(response) {
-				alert("Send: " + response);
-			}
-		);
+		omegle('send&id='+this.id+'&msg='+message,function(){});
 	},
 	notifyTyping: function() {
-		omegle('typing&id='+this.id,
-			function(response) {
-				alert("Typing: "+response);
-			}
-		);
+		omegle('typing&id='+this.id,function(){});
 	},
 	notifyStoppedTyping: function() {
-		omegle('stoppedTyping&id='+this.id,
-			function(response) {
-				alert("Stopped Typing: " + response);
-			}
-		);
+		omegle('stoppedTyping&id='+this.id,function(){});
 	},
 	notifyDisconnect: function() {
-		omegle('disconnect&id='+this.id,
-			function(response) {
-				alert("Disconnect: " + response);
-			}
-		);
+		omegle('disconnect&id='+this.id,function(){});
 	}
 });
 
