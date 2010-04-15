@@ -1,0 +1,157 @@
+function omegle(targ,respfunc) {
+	new Ajax.Request("omegle.php?"+targ, {
+		method: 'get',
+		onSuccess: function(transport) {
+			var response = transport.responseText;
+			if(response.isJSON()) {
+				respfunc(response.evalJSON());
+			} /*else {
+				respfunc(response);
+			}*/
+		}.bind(targ),
+		onFailure: function() {
+			alert("Request failed");
+		}
+	});
+}
+
+function display_event(id,omegle_event,css_class) {
+	// Update table_events
+	var tr = $('table_events').insertRow(-1);
+	tr.className = css_class;
+	
+	var td = tr.insertCell(-1);
+	td.innerHTML = id;
+
+	td = tr.insertCell(-1);
+	td.innerHTML = omegle_event[0];
+//	td = tr.insertCell(-1);
+//	if (omegle_event[1]) {
+//		td.innerHTML = omegle_event[1];	
+//	} else {
+//		td.innerHTML = "&nbsp;";
+//	}
+}
+
+var Stranger = Class.create({
+	initialize: function(chat_td_id,css_class) {
+		this.id = '';
+		
+		this.chat_td = $(chat_td_id);
+		this.css_class = css_class;
+	}
+});
+
+var OmegleConnection = Class.create({
+	initialize: function(chat_td_id,css_class) {
+		this.id = '';
+		this.strangers = [];
+		this.outputs = [];
+	
+	start: function(stranger_num) {
+		omegle('start',
+			function (response) {
+				this.strangers[stranger_num].id = response;
+				this.checkEvents(stranger_num);
+				alert
+			}.bind(this)
+		);
+	},
+	addTarget: function(which,target) {
+		if (isUndefined(this.outputs[which])) {
+			this.outputs[which] = [target];
+		} else {
+			this.outputs[which].push(target);
+		}
+//		alert(this.partners[0].css_class + " " + this.css_class);
+	},
+	systemMessage: function(which,message) {	
+		var span = new Element('span',{
+			'class': 'system'
+		}).update(message);
+		var br = new Element('br');
+
+		this.strangers[which].chat_td.appendChild(span);
+		this.strangers[which].chat_td.appendChild(br);
+	},
+	addToChat: function(which,source,css_class,message) {
+		var span = new Element('span',{
+			'class': css_class
+		}).update(source);
+		var text = document.createTextNode(message);
+		var br = new Element('br');
+
+		this.strangers[which].chat_td.appendChild(span);
+		this.strangers[which].chat_td.appendChild(text);
+		this.strangers[which].chat_td.appendChild(br);
+	},
+	checkEvents: function(which) {
+		omegle('events&id='+this.id,
+			function(events) {
+				for (var i = 0; i < events.length; i++) {
+					display_event(this.id,events[i],this.css_class);
+
+					var signal = events[i][0];
+					if (signal == 'gotMessage') {
+						var message = events[i][1];
+						this.addToChat('You: ',this.css_class,message);
+
+						for (var partner in this.partners) {
+//							alert(this.css_class + " <> " + this.partners[i].css_class);
+							partner.addToChat('Stranger: ',this.css_class,message);
+							partner.send(message);
+						}
+					} else if (signal == 'waiting') {
+						this.systemMessage("Looking for someone you can chat with. Hang on.");
+					} else if (signal == 'connected') {
+						this.systemMessage("You're now chatting with a random stranger. Say hi!");
+					} else if (signal == 'typing') {
+						for (var partner in this.partners) {
+							partner.notifyTyping();
+						}
+					} else if (signal == 'stoppedTyping') {
+						for (var partner in this.partners) {
+							partner.notifyStoppedTyping();
+						}
+					} else if (signal == 'strangerDisconnected') {
+						this.systemMessage("You have disconnected.");
+						for (var partner in this.partners) {
+							partner.notifyDisconnect();
+							partner.systemMessage("Your conversational partner has disconnected.");
+						}
+					}
+				}
+				this.checkEvents();
+			}.bind(this)
+		);
+	},
+	send: function(message) {
+		omegle('send&id='+this.id+'&msg='+message,
+			function(response) {
+				alert("Send: " + response);
+			}
+		);
+	},
+	notifyTyping: function() {
+		omegle('typing&id='+this.id,
+			function(response) {
+				alert("Typing: "+response);
+			}
+		);
+	},
+	notifyStoppedTyping: function() {
+		omegle('stoppedTyping&id='+this.id,
+			function(response) {
+				alert("Stopped Typing: " + response);
+			}
+		);
+	},
+	notifyDisconnect: function() {
+		omegle('disconnect&id='+this.id,
+			function(response) {
+				alert("Disconnect: " + response);
+			}
+		);
+	}
+});
+
