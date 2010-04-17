@@ -1,0 +1,50 @@
+#table_events {
+	width: 19%;
+	float:left;
+	display: none;
+}
+#table_chat {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+	float:right;
+	height: 100%;
+	overflow: hidden;
+}
+#table_chat tr, td {
+	border: 1px solid black;
+	vertical-align: top;
+}
+div.overlay {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: #f00;
+	z-index: 10;
+	color: #fff;
+	text-align: center;
+	font-weight: bold;
+}
+div.overlay iframe {
+	width: 100%;
+	height: 80%;
+}
+
+div.chat {
+	height: 90%;
+	overflow: auto;
+	background-color: #ddd;
+}
+span.speaker {
+	font-weight: bold;
+}
+div.system {
+	font-weight: bold;
+	font-style: italic;
+	color: #999;
+}
+div.status {
+	background-color: #ccc;
+}
