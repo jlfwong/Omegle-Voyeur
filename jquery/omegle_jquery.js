@@ -173,7 +173,7 @@ OmegleConnection = $.klass({
 						$("<div></div>")
 							.appendTo($(document.body))
 							.addClass("overlay")
-							.append("Omegle is requesting a captcha. Click on text, then respond to the recaptcha request<br/>")
+							.append("Omegle is requesting a captcha. Click on text, then respond to the recaptcha request. You must respond to the captcha from the same IP as the server. If you can't do that, come back and try again later.<br/>")
 							.append("<iframe src='http://www.omegle.com' />")
 							.append("Once finished, click ")
 							.append($("<input type='button'>")
